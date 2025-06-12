@@ -251,66 +251,67 @@
     const formStatus = document.getElementById('form-status');
 
     if (contactForm) {
-      contactForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
+        contactForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
 
-        // Collect form data
-        const formData = {
-          name: document.getElementById('name').value.trim(),
-          email: document.getElementById('email').value.trim(),
-          subject: document.getElementById('subject').value.trim(),
-          message: document.getElementById('message').value.trim()
-        };
+            // Show loading state
+            showFormStatus('Sending message...', 'info');
 
-        // Validate form data
-        if (!formData.name || !formData.email || !formData.subject || !formData.message) {
-          showFormStatus('Please fill in all fields.', 'error');
-          return;
-        }
+            // Collect form data
+            const formData = {
+                name: document.getElementById('name').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                subject: document.getElementById('subject').value.trim(),
+                message: document.getElementById('message').value.trim()
+            };
 
-        if (!isValidEmail(formData.email)) {
-          showFormStatus('Please enter a valid email address.', 'error');
-          return;
-        }
+            // Validate form data
+            if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+                showFormStatus('Please fill in all fields.', 'error');
+                return;
+            }
 
-        try {
-          // Send the data to the server
-          const response = await fetch('/api/contact', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
-          });
+            if (!isValidEmail(formData.email)) {
+                showFormStatus('Please enter a valid email address.', 'error');
+                return;
+            }
 
-          const result = await response.json();
+            try {
+                // Replace this URL with your Formspree form URL
+                const response = await fetch('https://formspree.io/f/YOUR_FORM_ID', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
 
-          if (result.success) {
-            showFormStatus('Message sent successfully! Thank you for reaching out.', 'success');
-            contactForm.reset();
-          } else {
-            showFormStatus(result.error || 'Failed to send message. Please try again.', 'error');
-          }
-        } catch (error) {
-          console.error('Error:', error);
-          showFormStatus('An error occurred. Please try again later.', 'error');
-        }
-      });
+                if (response.ok) {
+                    showFormStatus('Message sent successfully! Thank you for reaching out.', 'success');
+                    contactForm.reset();
+                } else {
+                    showFormStatus('Failed to send message. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showFormStatus('An error occurred. Please try again later.', 'error');
+            }
+        });
     }
 
     function showFormStatus(message, type) {
-      formStatus.textContent = message;
-      formStatus.className = type;
-      formStatus.style.display = 'block';
-      
-      // Auto-hide the message after 5 seconds
-      setTimeout(() => {
-        formStatus.style.display = 'none';
-      }, 5000);
+        formStatus.textContent = message;
+        formStatus.className = type;
+        formStatus.style.display = 'block';
+        
+        // Auto-hide the message after 5 seconds
+        setTimeout(() => {
+            formStatus.style.display = 'none';
+        }, 5000);
     }
 
     function isValidEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
   });
 
