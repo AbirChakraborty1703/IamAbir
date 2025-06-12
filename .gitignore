@@ -1,6 +1,6 @@
 # Ignore node_modules and environment files
 node_modules/
-.env
+
 # Ignore OS and editor files
 .DS_Store
 Thumbs.db
