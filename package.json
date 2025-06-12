@@ -1,0 +1,16 @@
+{
+  "name": "folio",
+  "version": "1.0.0",
+  "description": "My Folio project",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"No test specified\" && exit 0"
+  },
+  "author": "Abir Chakraborty",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "mongoose": "^7.0.0"
+  }
+}
