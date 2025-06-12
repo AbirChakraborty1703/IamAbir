@@ -1,98 +1,92 @@
+/**
+ * main.js — Clean, Defensive, All-in-One
+ * Template: MyResume (Bootstrap v5.3.3)
+ *
+ * Make sure your HTML includes:
+ *   <form class="contact-form">
+ *     <div class="loading" style="display:none">Loading…</div>
+ *     <div class="error-message" style="display:none"></div>
+ *     <div class="sent-message" style="display:none"></div>
+ *     <input id="name"    name="name"    />
+ *     <input id="email"   name="email"   />
+ *     <input id="subject" name="subject" />
+ *     <textarea id="message" name="message"></textarea>
+ *     <button type="submit">Send</button>
+ *   </form>
+ */
 
-(function() {
+document.addEventListener('DOMContentLoaded', () => {
   "use strict";
 
-  /**
-   * Header toggle
-   */
+  /*** Utility: Show / Hide ***/
+  const show = (el, display = 'block') => el && (el.style.display = display);
+  const hide = el => el && (el.style.display = 'none');
+
+  /*** HEADER TOGGLE ***/
   const headerToggleBtn = document.querySelector('.header-toggle');
-
-  function headerToggle() {
-    document.querySelector('#header').classList.toggle('header-show');
-    headerToggleBtn.classList.toggle('bi-list');
-    headerToggleBtn.classList.toggle('bi-x');
+  const headerEl        = document.getElementById('header');
+  if (headerToggleBtn && headerEl) {
+    headerToggleBtn.addEventListener('click', () => {
+      headerEl.classList.toggle('header-show');
+      headerToggleBtn.classList.toggle('bi-list');
+      headerToggleBtn.classList.toggle('bi-x');
+    });
   }
-  headerToggleBtn.addEventListener('click', headerToggle);
 
-  /**
-   * Hide mobile nav on same-page/hash links
-   */
-  document.querySelectorAll('#navmenu a').forEach(navmenu => {
-    navmenu.addEventListener('click', () => {
-      if (document.querySelector('.header-show')) {
-        headerToggle();
+  /*** HIDE MOBILE NAV ON LINK CLICK ***/
+  document.querySelectorAll('#navmenu a').forEach(link => {
+    link.addEventListener('click', () => {
+      if (headerEl?.classList.contains('header-show')) {
+        headerToggleBtn.click();
       }
     });
-
   });
 
-  /**
-   * Toggle mobile nav dropdowns
-   */
-  document.querySelectorAll('.navmenu .toggle-dropdown').forEach(navmenu => {
-    navmenu.addEventListener('click', function(e) {
+  /*** MOBILE NAV DROPDOWNS ***/
+  document.querySelectorAll('.navmenu .toggle-dropdown').forEach(toggle => {
+    toggle.addEventListener('click', e => {
       e.preventDefault();
-      this.parentNode.classList.toggle('active');
-      this.parentNode.nextElementSibling.classList.toggle('dropdown-active');
+      const parent = toggle.parentNode;
+      parent.classList.toggle('active');
+      parent.nextElementSibling?.classList.toggle('dropdown-active');
       e.stopImmediatePropagation();
     });
   });
 
-  /**
-   * Preloader
-   */
-  const preloader = document.querySelector('#preloader');
+  /*** PRELOADER ***/
+  const preloader = document.getElementById('preloader');
   if (preloader) {
-    window.addEventListener('load', () => {
-      preloader.remove();
-    });
+    window.addEventListener('load', () => preloader.remove());
   }
 
-  /**
-   * Scroll top button
-   */
-  let scrollTop = document.querySelector('.scroll-top');
-
+  /*** SCROLL-TOP BUTTON ***/
+  const scrollTopBtn = document.querySelector('.scroll-top');
   function toggleScrollTop() {
-    if (scrollTop) {
-      window.scrollY > 100 ? scrollTop.classList.add('active') : scrollTop.classList.remove('active');
-    }
+    if (!scrollTopBtn) return;
+    scrollTopBtn.classList.toggle('active', window.scrollY > 100);
   }
-  if (scrollTop) {
-    scrollTop.addEventListener('click', (e) => {
+  if (scrollTopBtn) {
+    scrollTopBtn.addEventListener('click', e => {
       e.preventDefault();
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+    window.addEventListener('scroll', toggleScrollTop);
+    window.addEventListener('load', toggleScrollTop);
   }
 
-  window.addEventListener('load', toggleScrollTop);
-  document.addEventListener('scroll', toggleScrollTop);
+  /*** AOS ANIMATIONS ***/
+  window.addEventListener('load', () => {
+    if (window.AOS) {
+      AOS.init({ duration: 600, easing: 'ease-in-out', once: true, mirror: false });
+    }
+  });
 
-  /**
-   * Animation on scroll function and init
-   */
-  function aosInit() {
-    AOS.init({
-      duration: 600,
-      easing: 'ease-in-out',
-      once: true,
-      mirror: false
-    });
-  }
-  window.addEventListener('load', aosInit);
-
-  /**
-   * Init typed.js
-   */
-  const selectTyped = document.querySelector('.typed');
-  if (selectTyped) {
-    let typed_strings = selectTyped.getAttribute('data-typed-items');
-    typed_strings = typed_strings.split(',');
+  /*** TYPED.JS ***/
+  const typedEl = document.querySelector('.typed');
+  if (typedEl && window.Typed) {
+    const items = typedEl.getAttribute('data-typed-items')?.split(',') || [];
     new Typed('.typed', {
-      strings: typed_strings,
+      strings: items,
       loop: true,
       typeSpeed: 100,
       backSpeed: 50,
@@ -100,211 +94,154 @@
     });
   }
 
-  /**
-   * Initiate Pure Counter
-   */
-  new PureCounter();
+  /*** PURE COUNTER ***/
+  if (window.PureCounter) {
+    new PureCounter();
+  }
 
-  /**
-   * Animate the skills items on reveal
-   */
-  let skillsAnimation = document.querySelectorAll('.skills-animation');
-  skillsAnimation.forEach((item) => {
-    new Waypoint({
-      element: item,
-      offset: '80%',
-      handler: function(direction) {
-        let progress = item.querySelectorAll('.progress .progress-bar');
-        progress.forEach(el => {
-          el.style.width = el.getAttribute('aria-valuenow') + '%';
-        });
-      }
-    });
+  /*** SKILLS PROGRESS ANIMATION ***/
+  document.querySelectorAll('.skills-animation').forEach(item => {
+    if (window.Waypoint) {
+      new Waypoint({
+        element: item,
+        offset: '80%',
+        handler: () => {
+          item.querySelectorAll('.progress .progress-bar').forEach(bar => {
+            bar.style.width = bar.getAttribute('aria-valuenow') + '%';
+          });
+        }
+      });
+    }
   });
 
-  /**
-   * Initiate glightbox
-   */
-  const glightbox = GLightbox({
-    selector: '.glightbox'
-  });
-  /**
-   * Init swiper sliders
-   */
+  /*** GLIGHTBOX ***/
+  if (window.GLightbox) {
+    GLightbox({ selector: '.glightbox' });
+  }
+
+  /*** SWIPER SLIDERS ***/
   function initSwiper() {
-    document.querySelectorAll(".init-swiper").forEach(function(swiperElement) {
-      let config = JSON.parse(
-        swiperElement.querySelector(".swiper-config").innerHTML.trim()
-      );
-
-      // Remove testimonial swiper initialization
-      // Only initialize if not a testimonials section
-      if (swiperElement.closest('.testimonials')) return;
-
-      if (swiperElement.classList.contains("swiper-tab")) {
-        initSwiperWithCustomPagination(swiperElement, config);
-      } else {
-        new Swiper(swiperElement, config);
+    document.querySelectorAll('.init-swiper').forEach(el => {
+      const cfgEl = el.querySelector('.swiper-config');
+      if (!cfgEl || el.closest('.testimonials')) return;
+      try {
+        const cfg = JSON.parse(cfgEl.textContent.trim());
+        if (el.classList.contains('swiper-tab')) {
+          initSwiperWithCustomPagination(el, cfg);
+        } else {
+          new Swiper(el, cfg);
+        }
+      } catch (err) {
+        console.error('Swiper config parse error:', err);
       }
     });
   }
+  window.addEventListener('load', initSwiper);
 
-  window.addEventListener("load", initSwiper);
-
-  /**
-   * Correct scrolling position upon page load for URLs containing hash links.
-   */
-  window.addEventListener('load', function(e) {
+  /*** HASH-SCROLL CORRECTION ***/
+  window.addEventListener('load', () => {
     if (window.location.hash) {
-      if (document.querySelector(window.location.hash)) {
+      const target = document.querySelector(window.location.hash);
+      if (target) {
         setTimeout(() => {
-          let section = document.querySelector(window.location.hash);
-          let scrollMarginTop = getComputedStyle(section).scrollMarginTop;
-          window.scrollTo({
-            top: section.offsetTop - parseInt(scrollMarginTop),
-            behavior: 'smooth'
-          });
+          const margin = parseInt(getComputedStyle(target).scrollMarginTop) || 0;
+          window.scrollTo({ top: target.offsetTop - margin, behavior: 'smooth' });
         }, 100);
       }
     }
   });
 
-  /**
-   * Navmenu Scrollspy
-   */
-  let navmenulinks = document.querySelectorAll('.navmenu a');
-
-  function navmenuScrollspy() {
-    navmenulinks.forEach(navmenulink => {
-      if (!navmenulink.hash) return;
-      let section = document.querySelector(navmenulink.hash);
+  /*** NAVMENU SCROLLSPY ***/
+  const navLinks = document.querySelectorAll('.navmenu a');
+  function scrollspy() {
+    const pos = window.scrollY + 200;
+    navLinks.forEach(link => {
+      if (!link.hash) return;
+      const section = document.querySelector(link.hash);
       if (!section) return;
-      let position = window.scrollY + 200;
-      if (position >= section.offsetTop && position <= (section.offsetTop + section.offsetHeight)) {
-        document.querySelectorAll('.navmenu a.active').forEach(link => link.classList.remove('active'));
-        navmenulink.classList.add('active');
-      } else {
-        navmenulink.classList.remove('active');
-      }
-    })
-  }
-  window.addEventListener('load', navmenuScrollspy);
-  document.addEventListener('scroll', navmenuScrollspy);
-
-  /**
-   * Contact form AJAX submission
-   */
-  const contactForm = document.querySelector('.contact-form');
-  if (contactForm) {
-    contactForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const loading = contactForm.querySelector('.loading');
-      const errorMsg = contactForm.querySelector('.error-message');
-      const sentMsg = contactForm.querySelector('.sent-message');
-      loading.style.display = 'block';
-      errorMsg.style.display = 'none';
-      sentMsg.style.display = 'none';
-
-      const formData = new FormData(contactForm);
-      const data = {};
-      formData.forEach((value, key) => { data[key] = value; });
-
-      fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      })
-      .then(async response => {
-        loading.style.display = 'none';
-        if (response.ok) {
-          sentMsg.style.display = 'block';
-          contactForm.reset();
-        } else {
-          let res = {};
-          try { res = await response.json(); } catch {}
-          errorMsg.textContent = res.error || 'Submission failed. Status: ' + response.status;
-          errorMsg.style.display = 'block';
-          // Debug: log response for troubleshooting
-          console.error('Contact form response error:', response.status, res);
-        }
-      })
-      .catch((err) => {
-        loading.style.display = 'none';
-        errorMsg.textContent = 'Network error. Please try again.';
-        errorMsg.style.display = 'block';
-        // Debug: log error to console
-        console.error('Contact form fetch error:', err);
-      });
+      link.classList.toggle('active',
+        pos >= section.offsetTop &&
+        pos <= section.offsetTop + section.offsetHeight
+      );
     });
   }
+  window.addEventListener('load', scrollspy);
+  window.addEventListener('scroll', scrollspy);
 
-  // Contact Form Handling
-  document.addEventListener('DOMContentLoaded', function() {
-    const contactForm = document.getElementById('contactForm');
-    const formStatus = document.getElementById('form-status');
+  /*** CONTACT FORM AJAX SUBMISSION ***/
+  (function contactFormHandler() {
+    const form       = document.querySelector('.contact-form');
+    const loading    = form?.querySelector('.loading');
+    const errorMsg   = form?.querySelector('.error-message');
+    const successMsg = form?.querySelector('.sent-message');
 
-    if (contactForm) {
-      contactForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-
-        // Collect form data
-        const formData = {
-          name: document.getElementById('name').value.trim(),
-          email: document.getElementById('email').value.trim(),
-          subject: document.getElementById('subject').value.trim(),
-          message: document.getElementById('message').value.trim()
-        };
-
-        // Validate form data
-        if (!formData.name || !formData.email || !formData.subject || !formData.message) {
-          showFormStatus('Please fill in all fields.', 'error');
-          return;
-        }
-
-        if (!isValidEmail(formData.email)) {
-          showFormStatus('Please enter a valid email address.', 'error');
-          return;
-        }
-
-        try {
-          // Send the data to the server
-          const response = await fetch('/api/contact', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
-          });
-
-          const result = await response.json();
-
-          if (result.success) {
-            showFormStatus('Message sent successfully! Thank you for reaching out.', 'success');
-            contactForm.reset();
-          } else {
-            showFormStatus(result.error || 'Failed to send message. Please try again.', 'error');
-          }
-        } catch (error) {
-          console.error('Error:', error);
-          showFormStatus('An error occurred. Please try again later.', 'error');
-        }
-      });
+    if (!form) {
+      console.warn('No .contact-form found on page.');
+      return;
     }
 
-    function showFormStatus(message, type) {
-      formStatus.textContent = message;
-      formStatus.className = type;
-      formStatus.style.display = 'block';
-      
-      // Auto-hide the message after 5 seconds
-      setTimeout(() => {
-        formStatus.style.display = 'none';
-      }, 5000);
-    }
+    const isValidEmail = email => /^\S+@\S+\.\S+$/.test(email);
 
-    function isValidEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-  });
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      hide(errorMsg);
+      hide(successMsg);
+      show(loading);
 
-})();
+      // Collect inputs
+      const data = {
+        name:    form.querySelector('#name')?.value.trim()    || '',
+        email:   form.querySelector('#email')?.value.trim()   || '',
+        subject: form.querySelector('#subject')?.value.trim() || '',
+        message: form.querySelector('#message')?.value.trim() || ''
+      };
+
+      // Validate
+      if (!data.name || !data.email || !data.subject || !data.message) {
+        hide(loading);
+        show(errorMsg);
+        errorMsg.textContent = 'Please fill in all fields.';
+        return;
+      }
+      if (!isValidEmail(data.email)) {
+        hide(loading);
+        show(errorMsg);
+        errorMsg.textContent = 'Please enter a valid email address.';
+        return;
+      }
+
+      try {
+        // 🔧 Replace with your actual form endpoint:
+        const ENDPOINT = 'https://YOUR-FORM-ENDPOINT/api/contact';
+
+        const resp = await fetch(ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        hide(loading);
+
+        // Attempt to parse JSON; fallback to raw text
+        const text = await resp.text();
+        let result;
+        try { result = JSON.parse(text); } catch { result = null; }
+
+        if (resp.ok && result?.success !== false) {
+          show(successMsg);
+          successMsg.textContent = result?.message || 'Message sent successfully!';
+          form.reset();
+        } else {
+          show(errorMsg);
+          errorMsg.textContent = result?.error || `Submission failed (status ${resp.status})`;
+          console.error('Contact error:', resp.status, text);
+        }
+      } catch (err) {
+        hide(loading);
+        show(errorMsg);
+        errorMsg.textContent = 'Network error. Please try again.';
+        console.error('Network error:', err);
+      }
+    });
+  })();
+
+});
