@@ -1,3 +1,4 @@
+
 (function() {
   "use strict";
 
@@ -194,141 +195,63 @@
    */
   const contactForm = document.querySelector('.contact-form');
   if (contactForm) {
-    // Create message elements if they don't exist
-    let loading = contactForm.querySelector('.loading');
-    let errorMsg = contactForm.querySelector('.error-message');
-    let sentMsg = contactForm.querySelector('.sent-message');
-    
-    if (!loading) {
-      loading = document.createElement('div');
-      loading.className = 'loading';
-      loading.textContent = 'Loading...';
-      loading.style.display = 'none';
-      contactForm.insertBefore(loading, contactForm.querySelector('button[type="submit"]').parentNode);
-    }
-    
-    if (!errorMsg) {
-      errorMsg = document.createElement('div');
-      errorMsg.className = 'error-message';
-      errorMsg.style.display = 'none';
-      contactForm.insertBefore(errorMsg, contactForm.querySelector('button[type="submit"]').parentNode);
-    }
-    
-    if (!sentMsg) {
-      sentMsg = document.createElement('div');
-      sentMsg.className = 'sent-message';
-      sentMsg.textContent = 'Your message has been sent. Thank you!';
-      sentMsg.style.display = 'none';
-      contactForm.insertBefore(sentMsg, contactForm.querySelector('button[type="submit"]').parentNode);
-    }
-
-    contactForm.addEventListener('submit', function(e) {
+    contactForm.addEventListener('submit', async function(e) {
       e.preventDefault();
-      loading.style.display = 'block';
-      errorMsg.style.display = 'none';
-      sentMsg.style.display = 'none';
+      
+      const formStatus = document.getElementById('form-status');
+      const submitButton = contactForm.querySelector('button[type="submit"]');
+      
+      // Disable submit button and show loading state
+      submitButton.disabled = true;
+      submitButton.innerHTML = 'Sending...';
+      formStatus.style.display = 'block';
+      formStatus.className = 'mt-4 text-center alert alert-info';
+      formStatus.innerHTML = 'Sending message...';
 
-      const formData = new FormData(contactForm);
-      const data = {};
-      formData.forEach((value, key) => { data[key] = value; });
+      try {
+        const formData = new FormData(this);
+        const data = {
+          name: formData.get('name'),
+          email: formData.get('email'),
+          subject: formData.get('subject'),
+          message: formData.get('message')
+        };
 
-      fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      })
-      .then(async response => {
-        loading.style.display = 'none';
-        if (response.ok) {
-          sentMsg.style.display = 'block';
-          contactForm.reset();
-        } else {
-          let res = {};
-          try { res = await response.json(); } catch {}
-          errorMsg.textContent = res.error || 'Submission failed. Status: ' + response.status;
-          errorMsg.style.display = 'block';
-          // Debug: log response for troubleshooting
-          console.error('Contact form response error:', response.status, res);
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Something went wrong');
         }
-      })
-      .catch((err) => {
-        loading.style.display = 'none';
-        errorMsg.textContent = 'Network error. Please try again.';
-        errorMsg.style.display = 'block';
-        // Debug: log error to console
-        console.error('Contact form fetch error:', err);
-      });
+
+        // Success
+        formStatus.className = 'mt-4 text-center alert alert-success';
+        formStatus.innerHTML = 'Your message has been sent. Thank you!';
+        contactForm.reset();
+      } catch (error) {
+        console.error('Form submission error:', error);
+        formStatus.className = 'mt-4 text-center alert alert-danger';
+        formStatus.innerHTML = error.message || 'An error occurred while sending the message. Please try again.';
+      } finally {
+        // Re-enable submit button
+        submitButton.disabled = false;
+        submitButton.innerHTML = 'Send Message';
+        
+        // Hide status message after 5 seconds on success
+        if (formStatus.classList.contains('alert-success')) {
+          setTimeout(() => {
+            formStatus.style.display = 'none';
+          }, 5000);
+        }
+      }
     });
   }
-
-  // Contact Form Handling
-  document.addEventListener('DOMContentLoaded', function() {
-    const contactForm = document.getElementById('contactForm');
-    const formStatus = document.getElementById('form-status');
-
-    if (contactForm) {
-        contactForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            // Show loading state
-            showFormStatus('Sending message...', 'info');
-
-            // Collect form data
-            const formData = {
-                name: document.getElementById('name').value.trim(),
-                email: document.getElementById('email').value.trim(),
-                subject: document.getElementById('subject').value.trim(),
-                message: document.getElementById('message').value.trim()
-            };
-
-            // Validate form data
-            if (!formData.name || !formData.email || !formData.subject || !formData.message) {
-                showFormStatus('Please fill in all fields.', 'error');
-                return;
-            }
-
-            if (!isValidEmail(formData.email)) {
-                showFormStatus('Please enter a valid email address.', 'error');
-                return;
-            }
-
-            try {
-                // Replace this URL with your Formspree form URL
-                const response = await fetch('https://formspree.io/f/YOUR_FORM_ID', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
-                });
-
-                if (response.ok) {
-                    showFormStatus('Message sent successfully! Thank you for reaching out.', 'success');
-                    contactForm.reset();
-                } else {
-                    showFormStatus('Failed to send message. Please try again.', 'error');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showFormStatus('An error occurred. Please try again later.', 'error');
-            }
-        });
-    }
-
-    function showFormStatus(message, type) {
-        formStatus.textContent = message;
-        formStatus.className = type;
-        formStatus.style.display = 'block';
-        
-        // Auto-hide the message after 5 seconds
-        setTimeout(() => {
-            formStatus.style.display = 'none';
-        }, 5000);
-    }
-
-    function isValidEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-  });
 
 })();
