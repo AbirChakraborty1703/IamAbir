@@ -1,11 +1,3 @@
-/**
-* Template Name: MyResume
-* Template URL: https://bootstrapmade.com/free-html-bootstrap-template-my-resume/
-* Updated: Jun 29 2024 with Bootstrap v5.3.3
-* Author: BootstrapMade.com
-* License: https://bootstrapmade.com/license/
-*/
-
 (function() {
   "use strict";
 
@@ -197,17 +189,41 @@
   }
   window.addEventListener('load', navmenuScrollspy);
   document.addEventListener('scroll', navmenuScrollspy);
-
   /**
    * Contact form AJAX submission
    */
   const contactForm = document.querySelector('.contact-form');
   if (contactForm) {
+    // Create message elements if they don't exist
+    let loading = contactForm.querySelector('.loading');
+    let errorMsg = contactForm.querySelector('.error-message');
+    let sentMsg = contactForm.querySelector('.sent-message');
+    
+    if (!loading) {
+      loading = document.createElement('div');
+      loading.className = 'loading';
+      loading.textContent = 'Loading...';
+      loading.style.display = 'none';
+      contactForm.insertBefore(loading, contactForm.querySelector('button[type="submit"]').parentNode);
+    }
+    
+    if (!errorMsg) {
+      errorMsg = document.createElement('div');
+      errorMsg.className = 'error-message';
+      errorMsg.style.display = 'none';
+      contactForm.insertBefore(errorMsg, contactForm.querySelector('button[type="submit"]').parentNode);
+    }
+    
+    if (!sentMsg) {
+      sentMsg = document.createElement('div');
+      sentMsg.className = 'sent-message';
+      sentMsg.textContent = 'Your message has been sent. Thank you!';
+      sentMsg.style.display = 'none';
+      contactForm.insertBefore(sentMsg, contactForm.querySelector('button[type="submit"]').parentNode);
+    }
+
     contactForm.addEventListener('submit', function(e) {
       e.preventDefault();
-      const loading = contactForm.querySelector('.loading');
-      const errorMsg = contactForm.querySelector('.error-message');
-      const sentMsg = contactForm.querySelector('.sent-message');
       loading.style.display = 'block';
       errorMsg.style.display = 'none';
       sentMsg.style.display = 'none';
