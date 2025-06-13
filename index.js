@@ -2,14 +2,18 @@ require('dotenv').config();
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const connectDB = require('./config/database');
 const mongoose = require('mongoose');
 
 const PORT = process.env.PORT || 3000;
 const baseDir = __dirname;
 
-// Connect to MongoDB Atlas
-connectDB();
+const MONGODB_URI = process.env.MONGODB_URI;
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('MongoDB connected!'))
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
+  });
 
 const contactSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
