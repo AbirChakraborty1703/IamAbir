@@ -240,72 +240,70 @@
   }
 
   // Contact Form Handling
-  document.addEventListener('DOMContentLoaded', function() {
-    const contactForm = document.getElementById('contactForm');
-    const formStatus = document.getElementById('form-status');
+document.addEventListener('DOMContentLoaded', function () {
+  const contactForm = document.querySelector('#contactForm');
+  const formStatus = document.getElementById('form-status');
 
-    if (contactForm) {
-      contactForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
+  if (contactForm) {
+    contactForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
 
-        // Collect form data
-        const formData = {
-          name: document.getElementById('name').value.trim(),
-          email: document.getElementById('email').value.trim(),
-          subject: document.getElementById('subject').value.trim(),
-          message: document.getElementById('message').value.trim()
-        };
+      const name = document.getElementById('name')?.value.trim();
+      const email = document.getElementById('email')?.value.trim();
+      const subject = document.getElementById('subject')?.value.trim();
+      const message = document.getElementById('message')?.value.trim();
 
-        // Validate form data
-        if (!formData.name || !formData.email || !formData.subject || !formData.message) {
-          showFormStatus('Please fill in all fields.', 'error');
-          return;
-        }
+      if (!name || !email || !subject || !message) {
+        return showFormStatus('Please fill in all fields.', 'error');
+      }
 
-        if (!isValidEmail(formData.email)) {
-          showFormStatus('Please enter a valid email address.', 'error');
-          return;
-        }
+      if (!isValidEmail(email)) {
+        return showFormStatus('Please enter a valid email address.', 'error');
+      }
 
-        try {
-          // Send the data to the server
-          const response = await fetch('/api/contact', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
-          });
+      try {
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name, email, subject, message }),
+        });
 
-          const result = await response.json();
+        const contentType = response.headers.get("content-type");
 
-          if (result.success) {
-            showFormStatus('Message sent successfully! Thank you for reaching out.', 'success');
-            contactForm.reset();
-          } else {
-            showFormStatus(result.error || 'Failed to send message. Please try again.', 'error');
+        if (!response.ok) {
+          let errorText = 'Failed to send message.';
+          if (contentType && contentType.includes("application/json")) {
+            const res = await response.json();
+            errorText = res.message || errorText;
           }
-        } catch (error) {
-          console.error('Error:', error);
-          showFormStatus('An error occurred. Please try again later.', 'error');
+          throw new Error(errorText);
         }
-      });
-    }
 
-    function showFormStatus(message, type) {
-      formStatus.textContent = message;
-      formStatus.className = type;
-      formStatus.style.display = 'block';
-      
-      // Auto-hide the message after 5 seconds
-      setTimeout(() => {
-        formStatus.style.display = 'none';
-      }, 5000);
-    }
+        showFormStatus('Message sent successfully! Thank you for reaching out.', 'success');
+        contactForm.reset();
+      } catch (err) {
+        console.error('Submission error:', err);
+        showFormStatus(err.message || 'An error occurred. Please try again later.', 'error');
+      }
+    });
+  }
 
-    function isValidEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-  });
+  function showFormStatus(message, type) {
+    if (!formStatus) return;
+    formStatus.textContent = message;
+    formStatus.className = type;
+    formStatus.style.display = 'block';
+
+    setTimeout(() => {
+      formStatus.style.display = 'none';
+    }, 5000);
+  }
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+});
 
 })();
