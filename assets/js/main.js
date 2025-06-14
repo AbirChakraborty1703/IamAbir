@@ -1,5 +1,3 @@
-
-
 (function() {
   "use strict";
 
@@ -7,13 +5,13 @@
    * Header toggle
    */
   const headerToggleBtn = document.querySelector('.header-toggle');
-
-  function headerToggle() {
-    document.querySelector('#header').classList.toggle('header-show');
-    headerToggleBtn.classList.toggle('bi-list');
-    headerToggleBtn.classList.toggle('bi-x');
+  if (headerToggleBtn) {
+    headerToggleBtn.addEventListener('click', function() {
+      document.querySelector('#header').classList.toggle('header-show');
+      this.classList.toggle('bi-list');
+      this.classList.toggle('bi-x');
+    });
   }
-  headerToggleBtn.addEventListener('click', headerToggle);
 
   /**
    * Hide mobile nav on same-page/hash links
@@ -21,10 +19,9 @@
   document.querySelectorAll('#navmenu a').forEach(navmenu => {
     navmenu.addEventListener('click', () => {
       if (document.querySelector('.header-show')) {
-        headerToggle();
+        headerToggleBtn.click();
       }
     });
-
   });
 
   /**
@@ -52,8 +49,7 @@
   /**
    * Scroll top button
    */
-  let scrollTop = document.querySelector('.scroll-top');
-
+  const scrollTop = document.querySelector('.scroll-top');
   function toggleScrollTop() {
     if (scrollTop) {
       window.scrollY > 100 ? scrollTop.classList.add('active') : scrollTop.classList.remove('active');
@@ -62,18 +58,14 @@
   if (scrollTop) {
     scrollTop.addEventListener('click', (e) => {
       e.preventDefault();
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
-
   window.addEventListener('load', toggleScrollTop);
   document.addEventListener('scroll', toggleScrollTop);
 
   /**
-   * Animation on scroll function and init
+   * AOS init
    */
   function aosInit() {
     AOS.init({
@@ -86,12 +78,11 @@
   window.addEventListener('load', aosInit);
 
   /**
-   * Init typed.js
+   * Typed.js init
    */
   const selectTyped = document.querySelector('.typed');
   if (selectTyped) {
-    let typed_strings = selectTyped.getAttribute('data-typed-items');
-    typed_strings = typed_strings.split(',');
+    let typed_strings = selectTyped.getAttribute('data-typed-items').split(',');
     new Typed('.typed', {
       strings: typed_strings,
       loop: true,
@@ -102,19 +93,19 @@
   }
 
   /**
-   * Initiate Pure Counter
+   * Pure Counter init
    */
   new PureCounter();
 
   /**
-   * Animate the skills items on reveal
+   * Animate skills items on scroll
    */
   let skillsAnimation = document.querySelectorAll('.skills-animation');
-  skillsAnimation.forEach((item) => {
+  skillsAnimation.forEach(item => {
     new Waypoint({
       element: item,
       offset: '80%',
-      handler: function(direction) {
+      handler: function() {
         let progress = item.querySelectorAll('.progress .progress-bar');
         progress.forEach(el => {
           el.style.width = el.getAttribute('aria-valuenow') + '%';
@@ -124,24 +115,17 @@
   });
 
   /**
-   * Initiate glightbox
+   * GLightbox init
    */
-  const glightbox = GLightbox({
-    selector: '.glightbox'
-  });
+  GLightbox({ selector: '.glightbox' });
+
   /**
-   * Init swiper sliders
+   * Swiper init
    */
   function initSwiper() {
-    document.querySelectorAll(".init-swiper").forEach(function(swiperElement) {
-      let config = JSON.parse(
-        swiperElement.querySelector(".swiper-config").innerHTML.trim()
-      );
-
-      // Remove testimonial swiper initialization
-      // Only initialize if not a testimonials section
+    document.querySelectorAll(".init-swiper").forEach(swiperElement => {
+      let config = JSON.parse(swiperElement.querySelector(".swiper-config").innerHTML.trim());
       if (swiperElement.closest('.testimonials')) return;
-
       if (swiperElement.classList.contains("swiper-tab")) {
         initSwiperWithCustomPagination(swiperElement, config);
       } else {
@@ -149,32 +133,28 @@
       }
     });
   }
-
   window.addEventListener("load", initSwiper);
 
   /**
-   * Correct scrolling position upon page load for URLs containing hash links.
+   * Scroll to hash on load
    */
-  window.addEventListener('load', function(e) {
-    if (window.location.hash) {
-      if (document.querySelector(window.location.hash)) {
-        setTimeout(() => {
-          let section = document.querySelector(window.location.hash);
-          let scrollMarginTop = getComputedStyle(section).scrollMarginTop;
-          window.scrollTo({
-            top: section.offsetTop - parseInt(scrollMarginTop),
-            behavior: 'smooth'
-          });
-        }, 100);
-      }
+  window.addEventListener('load', () => {
+    if (window.location.hash && document.querySelector(window.location.hash)) {
+      setTimeout(() => {
+        let section = document.querySelector(window.location.hash);
+        let scrollMarginTop = getComputedStyle(section).scrollMarginTop;
+        window.scrollTo({
+          top: section.offsetTop - parseInt(scrollMarginTop),
+          behavior: 'smooth'
+        });
+      }, 100);
     }
   });
 
   /**
-   * Navmenu Scrollspy
+   * Navmenu scrollspy
    */
   let navmenulinks = document.querySelectorAll('.navmenu a');
-
   function navmenuScrollspy() {
     navmenulinks.forEach(navmenulink => {
       if (!navmenulink.hash) return;
@@ -187,65 +167,19 @@
       } else {
         navmenulink.classList.remove('active');
       }
-    })
+    });
   }
   window.addEventListener('load', navmenuScrollspy);
   document.addEventListener('scroll', navmenuScrollspy);
 
   /**
-   * Contact form AJAX submission
+   * Contact Form Submission
    */
-  const contactForm = document.querySelector('.contact-form');
-  if (contactForm) {
-    contactForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const loading = contactForm.querySelector('.loading');
-      const errorMsg = contactForm.querySelector('.error-message');
-      const sentMsg = contactForm.querySelector('.sent-message');
-      loading.style.display = 'block';
-      errorMsg.style.display = 'none';
-      sentMsg.style.display = 'none';
-
-      const formData = new FormData(contactForm);
-      const data = {};
-      formData.forEach((value, key) => { data[key] = value; });
-
-      fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      })
-      .then(async response => {
-        loading.style.display = 'none';
-        if (response.ok) {
-          sentMsg.style.display = 'block';
-          contactForm.reset();
-        } else {
-          let res = {};
-          try { res = await response.json(); } catch {}
-          errorMsg.textContent = res.error || 'Submission failed. Status: ' + response.status;
-          errorMsg.style.display = 'block';
-          // Debug: log response for troubleshooting
-          console.error('Contact form response error:', response.status, res);
-        }
-      })
-      .catch((err) => {
-        loading.style.display = 'none';
-        errorMsg.textContent = 'Network error. Please try again.';
-        errorMsg.style.display = 'block';
-        // Debug: log error to console
-        console.error('Contact form fetch error:', err);
-      });
-    });
-  }
-
-  // Contact Form Handling
-document.addEventListener('DOMContentLoaded', function () {
-  const contactForm = document.querySelector('#contactForm');
+  const contactForm = document.getElementById('contactForm');
   const formStatus = document.getElementById('form-status');
 
   if (contactForm) {
-    contactForm.addEventListener('submit', async function (e) {
+    contactForm.addEventListener('submit', async function(e) {
       e.preventDefault();
 
       const name = document.getElementById('name')?.value.trim();
@@ -264,10 +198,8 @@ document.addEventListener('DOMContentLoaded', function () {
       try {
         const response = await fetch('/api/contact', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ name, email, subject, message }),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, subject, message })
         });
 
         const contentType = response.headers.get("content-type");
@@ -304,6 +236,5 @@ document.addEventListener('DOMContentLoaded', function () {
   function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
-});
 
 })();
