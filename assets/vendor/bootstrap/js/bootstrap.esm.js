@@ -1,20 +1,7 @@
-/*!
-  * Bootstrap v5.3.3 (https://getbootstrap.com/)
-  * Copyright 2011-2024 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
-  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-  */
+
 import * as Popper from '@popperjs/core';
 
-/**
- * --------------------------------------------------------------------------
- * Bootstrap dom/data.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- * --------------------------------------------------------------------------
- */
 
-/**
- * Constants
- */
 
 const elementMap = new Map();
 const Data = {
@@ -789,12 +776,6 @@ const SelectorEngine = {
   }
 };
 
-/**
- * --------------------------------------------------------------------------
- * Bootstrap util/component-functions.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- * --------------------------------------------------------------------------
- */
 
 const enableDismissTrigger = (component, method = 'hide') => {
   const clickEvent = `click.dismiss${component.EVENT_KEY}`;
@@ -952,18 +933,6 @@ EventHandler.on(document, EVENT_CLICK_DATA_API$6, SELECTOR_DATA_TOGGLE$5, event 
  */
 
 defineJQueryPlugin(Button);
-
-/**
- * --------------------------------------------------------------------------
- * Bootstrap util/swipe.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- * --------------------------------------------------------------------------
- */
-
-
-/**
- * Constants
- */
 
 const NAME$d = 'swipe';
 const EVENT_KEY$9 = '.bs.swipe';
@@ -1446,17 +1415,6 @@ EventHandler.on(window, EVENT_LOAD_DATA_API$3, () => {
 
 defineJQueryPlugin(Carousel);
 
-/**
- * --------------------------------------------------------------------------
- * Bootstrap collapse.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- * --------------------------------------------------------------------------
- */
-
-
-/**
- * Constants
- */
 
 const NAME$b = 'collapse';
 const DATA_KEY$7 = 'bs.collapse';
@@ -2368,17 +2326,7 @@ class ScrollBarHelper {
   }
 }
 
-/**
- * --------------------------------------------------------------------------
- * Bootstrap modal.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- * --------------------------------------------------------------------------
- */
 
-
-/**
- * Constants
- */
 
 const NAME$7 = 'modal';
 const DATA_KEY$4 = 'bs.modal';
@@ -2953,13 +2901,7 @@ const DefaultAllowlist = {
 
 const uriAttributes = new Set(['background', 'cite', 'href', 'itemtype', 'longdesc', 'poster', 'src', 'xlink:href']);
 
-/**
- * A pattern that recognizes URLs that are safe wrt. XSS in URL navigation
- * contexts.
- *
- * Shout-out to Angular https://github.com/angular/angular/blob/15.2.8/packages/core/src/sanitization/url_sanitizer.ts#L38
- */
-// eslint-disable-next-line unicorn/better-regex
+
 const SAFE_URL_PATTERN = /^(?!javascript:)(?:[a-z0-9+.-]+:|[^&:/?#]*(?:[/?#]|$))/i;
 const allowedAttribute = (attribute, allowedAttributeList) => {
   const attributeName = attribute.nodeName.toLowerCase();
@@ -3136,17 +3078,7 @@ class TemplateFactory extends Config {
   }
 }
 
-/**
- * --------------------------------------------------------------------------
- * Bootstrap tooltip.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- * --------------------------------------------------------------------------
- */
 
-
-/**
- * Constants
- */
 
 const NAME$4 = 'tooltip';
 const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn']);
@@ -3642,23 +3574,11 @@ class Tooltip extends BaseComponent {
   }
 }
 
-/**
- * jQuery
- */
+
 
 defineJQueryPlugin(Tooltip);
 
-/**
- * --------------------------------------------------------------------------
- * Bootstrap popover.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- * --------------------------------------------------------------------------
- */
 
-
-/**
- * Constants
- */
 
 const NAME$3 = 'popover';
 const SELECTOR_TITLE = '.popover-header';
